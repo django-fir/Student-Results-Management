@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load static %}
+
+  {% block home %}
+    
+ <style>
+  .ag-theme-alpine .ag-row-group {
+   font-weight: bold;
+  }
+ </style>
+ <div id="myGrid" style="height: 98%" class="ag-theme-alpine-dark"> 
+ </div>
+ 
+ <script>var __basePath = './';</script>
+  
+ <script src="https://cdn.jsdelivr.net/npm/ag-grid-enterprise@28.2.1/dist/ag-grid-enterprise.min.js">
+ </script>
+ <script src=" {% static 'data.js' %}">
+ </script>
+ <script src="{% static 'main.js' %}">
+ </script>
+ 
+  {% endblock home %}

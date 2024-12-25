@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@10.2.7/dist/css/autoComplete.min.css">
+</head>
+
+<body>
+  <div class="autoComplete_wrapper">
+    <input id="autoComplete" type="search" dir="ltr" spellcheck=false autocorrect="off" autocomplete="off"
+      autocapitalize="off">
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@10.2.7/dist/autoComplete.min.js"></script>
+  <script>
+    const autoCompleteJS = new autoComplete({
+      selector: "#autoComplete",
+      placeHolder: "Search for USN OR Name...",
+      data: {
+        src: async (query) => {
+          try {
+            // Fetch Data from external Source
+            const source = await fetch(`http://127.0.0.1:8000/query/${query}`);
+            // Data should be an array of `Objects` or `Strings`
+            const data = await source.json();
+
+            return data;
+          } catch (error) {
+            return error;
+          }
+        },
+        // Data source 'Object' key to be searched
+        // keys: [0]
+      },
+
+      resultsList: {
+        maxResults: 200,
+        element: (list, data) => {
+          if (!data.results.length) {
+            // Create "No Results" message element
+            const message = document.createElement("div");
+            // Add class to the created element
+            message.setAttribute("class", "no_result");
+            // Add message text content
+            message.innerHTML = `<span>Found No Results for "${data.query}"</span>`;
+            // Append message element to the results list
+            list.prepend(message);
+          }
+        },
+        noResults: true,
+
+      },
+      resultItem: {
+        highlight: true
+      },
+
+      events: {
+        input: {
+          selection: (event) => {
+            const selection = event.detail.selection.value;
+            autoCompleteJS.input.value = selection;
+            window.open(`/home/${selection.trim().slice(0, 10) }`)
+          },
+          keydown:(event) =>{
+            if(event.key == "Enter")
+            {
+              window.open(`/home/${autoCompleteJS.input.value}`)
+
+            }
+          },
+          
+        }
+      },
+      submit: true,
+
+    });
+  </script>
+</body>
+
+</html>

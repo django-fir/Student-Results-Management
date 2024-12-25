@@ -1,0 +1,164 @@
+def fackgenerator(request):
+    """name = models.CharField(max_length=100)
+    code = models.CharField(max_length=10)
+    attendence = models.IntegerField(default=0)
+    assinment = models.IntegerField(default=5)
+    sem = models.ForeignKey(Sem, on_delete=models.CASCADE)"""
+    def marks(m):
+        if "IA" in m:
+            return rd.randint(-1, 30)
+        else:
+            return rd.randint(-1, 60)
+
+    def semister(n):
+        return n
+
+    def usn(n, no):
+        # branch = ["CS", "EC", "IS", "ME", "CI", "EE"]
+        string = f"1VI{n}CS{no}"
+        return string
+
+    def subject():
+        with open(r'C:\Users\Govardhan\BackLog\subject.dat', "rb") as f1:
+            data = pickle.load(f1)
+            print("Unpickelled")
+        return data
+
+    def get_subject(n):
+        subjects = subject()
+        dlist = subjects.get(str(n))
+        dummy = {}
+        for k, v in dlist.items():
+            if k.startswith("18"):
+                dummy[k] = v
+        return dummy
+
+    mode = ["IA1", "IA2", "IA3", "MAIN"]
+
+    def results(marks, mode):
+        if "IA" in mode:
+            if marks >= 18:
+                return "Pass"
+            elif marks <= 0:
+                return "Absent"
+            return "Fail"
+        else:
+            if marks >= 24:
+                return "Pass"
+            elif marks <= 0:
+                return "Absent"
+            return "Fail"
+
+    def attendence():
+        return rd.randint(60, 100)
+
+    def asssinment():
+        return rd.randint(1, 10)
+
+    def main():
+        m = 0
+        studentl = []
+        for p in range(1, 10):
+            y = 2017
+            for i in range(18, 22):
+                u = f"00{p}" if p <= 9 else f"0{p}"if p <= 99 else f"{p}"
+                susn = usn(i, u)
+                for sem in range(3, 9):
+                    if sem % 2 == 1:
+                        m = 2
+                        y += 1
+                    else:
+                        m = 8
+                    sub = get_subject(sem)
+                    for ex in mode:
+                        d = rd.randint(1, 10)
+                        for sc, sn in sub.items():
+                            students = {}
+                            date = str(datetime.datetime(y, m, d).date())
+                            students["usn"] = susn
+                            students["sem"] = sem
+                            students["exam_type"] = ex
+                            students["subject"] = sc
+                            marksg = marks(ex)
+                            students["marks"] = marksg
+                            students["exam_date"] = date
+                            students["result"] = results(marksg, ex)
+                            students["attendence"] = attendence()
+                            students["asinment"] = asssinment()
+                            d += 1
+                            studentl.append(students)
+                        m += 1
+        return studentl
+
+    def internals():
+        for i in ["IA1", "IA2", "IA3", "MAIN-1", "MAIN-R", "MAIN-2"]:
+            EName.objects.get_or_create(name=i)
+
+    def modes():
+        for i in ["IA1", "IA2", "IA3", "MAIN-1", "MAIN-R", "MAIN-2"]:
+            min = 0
+            max = 0
+            sub = EName.objects.get(name=i)
+            if "IA" in i:
+                min = 18
+                max = 30
+            else:
+                min = 24
+                max = 60
+            ExamMode.objects.get_or_create(
+                name=sub, min_marks=min, max_marks=max)
+
+    def semister():
+        for i in ["1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th"]:
+            Sem.objects.get_or_create(name=i)
+
+    def msubjects():
+        for i in range(3, 9):
+            sem = Sem.objects.get(name__contains=f"{i}")
+            # print(sem)
+            sub = get_subject(i)
+            for c, n in sub.items():
+                pp = Subject.objects.get_or_create(
+                    sem=sem, code=c, name=n)
+                print(pp)
+
+    def mstudent():
+        for y in range(17, 22):
+            for s in range(1, 9):
+                sem = Sem.objects.get(name__contains=f"{s}")
+                for sec, uno in [("A", 1), ("B", 51), ("C", 101)]:
+                    for no in range(uno, uno+50):
+                        u = f"00{no}" if no <= 9 else f"0{no}"if no <= 99 else f"{no}"
+                        susn = usn(y+s, u)
+                        name = gen.name()
+                        Student.objects.get_or_create(
+                            name=name, sem=sem, usn=susn, section=sec)
+
+    def exam_detailes():
+        """student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    Emode = models.ForeignKey(ExamMode, on_delete=models.CASCADE)
+    added_date = models.DateTimeField(auto_now_add=True)
+    exam_date = models.DateField()
+    attendence = models.IntegerField(default=0)
+    assinment = models.IntegerField(default=5)
+    obtained_marks = models.IntegerField(blank=True, null=True)
+    result = models.CharField(max_length=10, choices=(
+        ("Pass", "Pass"), ("Fail", "Fail"), ("Absent", "Absent")), default="Pass", editable=False)"""
+
+        student = Student.objects.all()
+        sub = Subject.objects.all()
+        emode = ExamMode.objects.all()
+        # exam_date = str(datetime.datetime().date())
+        attendenc = attendence()
+        assinmen = asssinment()
+        # obtained_marks = marks(ex)
+
+        for i in student:
+                for k in sub.filter(sem=i.sem):
+                  for j in emode:                 
+                    Exam_Result.objects.get_or_create(student=i, subject=k, Emode=j, exam_date=str(gen.date()), attendence=attendence(),
+                                                      assinment=asssinment(),
+                                                      obtained_marks=marks(j.name.name))
+
+    # exam_detailes()
